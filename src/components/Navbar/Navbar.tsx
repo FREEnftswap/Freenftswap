@@ -1,9 +1,18 @@
 import styled from '@emotion/styled';
 import { useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { isCreateSwapModalState } from '../../Atoms';
 import { NavbarPropsType } from './Navbar.types';
 
 const Navbar: React.FC<NavbarPropsType> = () => {
-  const [walletAddress, setWalletAddress] = useState();
+  const [walletAddress, setWalletAddress] = useState('0x123123123123123123');
+
+  const [isCreateSwapModal, setIsCreateSwapModal] =
+    useRecoilState(isCreateSwapModalState);
+
+  const createSwapModalHandler = () => {
+    setIsCreateSwapModal(true);
+  };
 
   return (
     <>
@@ -12,7 +21,7 @@ const Navbar: React.FC<NavbarPropsType> = () => {
           <h1>Free Nft Swap</h1>
           <ButtonContainer>
             {walletAddress ? (
-              <CreateSwapItem>
+              <CreateSwapItem onClick={createSwapModalHandler}>
                 <span>Create Swap</span>
               </CreateSwapItem>
             ) : (

@@ -1,9 +1,13 @@
 import styled from '@emotion/styled';
+import { useRecoilState } from 'recoil';
+import { isCreateSwapModalState } from '../../Atoms';
+import CreateSwapModal from '../CreateSwapModal';
 import Footer from '../Footer';
 import Navbar from '../Navbar';
 import { LayoutPropsType } from './Layout.types';
 
 const Layout: React.FC<LayoutPropsType> = ({ children }) => {
+  const [isCreateSwapModal] = useRecoilState(isCreateSwapModalState);
   return (
     <>
       <Navbar />
@@ -11,6 +15,7 @@ const Layout: React.FC<LayoutPropsType> = ({ children }) => {
         <Wrapper>{children}</Wrapper>
       </Container>
       <Footer />
+      {isCreateSwapModal ? <CreateSwapModal /> : null}
     </>
   );
 };
