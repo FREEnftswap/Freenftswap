@@ -1,2 +1,2 @@
-export { default as Init } from './Init';
-export type { InitPropsType } from './Init';
+export { default as Layout } from './Layout';
+export type { LayoutPropsType } from './Layout';
