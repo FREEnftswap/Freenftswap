@@ -1,9 +1,10 @@
 import type { NextPage } from 'next';
+import SwapList from '../components/SwapList';
 
 const Home: NextPage = () => {
   return (
     <div>
-      <div>init</div>
+      <SwapList />
     </div>
   );
 };
