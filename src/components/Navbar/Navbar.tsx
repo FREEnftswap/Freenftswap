@@ -1,17 +1,31 @@
 import styled from '@emotion/styled';
+import { ethers } from 'ethers';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { isCreateSwapModalState } from '../../Atoms';
+import { isCreateSwapModalState, walletAddressState } from '../../Atoms';
 import { NavbarPropsType } from './Navbar.types';
-
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
 const Navbar: React.FC<NavbarPropsType> = () => {
-  const [walletAddress, setWalletAddress] = useState('0x123123123123123123');
+  const [walletAddress, setWalletAddress] = useRecoilState(walletAddressState);
 
   const [isCreateSwapModal, setIsCreateSwapModal] =
     useRecoilState(isCreateSwapModalState);
 
   const createSwapModalHandler = () => {
     setIsCreateSwapModal(true);
+  };
+
+  const walletConnectHandler = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+    await provider.send('eth_requestAccounts', []);
+    const signer = provider.getSigner();
+    const account = await signer.getAddress();
+    console.log('Account:');
+    setWalletAddress(account);
   };
 
   return (
@@ -29,7 +43,7 @@ const Navbar: React.FC<NavbarPropsType> = () => {
                 <span>Create Swap</span>
               </CreateSwapItemDisAble>
             )}
-            <ConnectWallet>
+            <ConnectWallet onClick={walletConnectHandler}>
               <span>{walletAddress ? <>{walletAddress}</> : 'Wallet Connect'}</span>
             </ConnectWallet>
           </ButtonContainer>

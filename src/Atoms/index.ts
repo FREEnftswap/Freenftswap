@@ -1,5 +1,10 @@
 import { atom } from 'recoil';
 
+export const walletAddressState = atom({
+  key: 'walletAddressState',
+  default: '',
+});
+
 export const isCreateSwapModalState = atom({
   key: 'isCreateSwapModalState',
   default: false,
