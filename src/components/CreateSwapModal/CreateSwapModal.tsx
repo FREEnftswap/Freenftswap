@@ -1,15 +1,20 @@
+import React from 'react';
 import styled from '@emotion/styled';
-import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import {
   haveCreateSwapState,
   isCreateSwapModalState,
+  walletAddressState,
   wantCreateSwapState,
 } from '../../Atoms';
 import CreateSwapForm from '../CreateSwapForm';
 import { CreateSwapModalPropsType } from './CreateSwapModal.types';
+import { firebaseCreator } from '../../utils/Handler/firebaseHandler';
+import { dbService } from '../../utils/FB';
 
 const CreateSwapModal: React.FC<CreateSwapModalPropsType> = () => {
+  const [walletAddress] = useRecoilState(walletAddressState);
+
   const [isCreateSwapModal, setIsCreateSwapModal] =
     useRecoilState(isCreateSwapModalState);
 
@@ -21,9 +26,43 @@ const CreateSwapModal: React.FC<CreateSwapModalPropsType> = () => {
     setIsCreateSwapModal(false);
   };
 
-  const formSubmit = () => {
-    alert(haveCreateSwap);
-    alert(wantCreateSwap);
+  const formSubmit = async () => {
+    const { haveData, wantData } = await createDataHandler();
+    await firebaseCreator(walletAddress, haveData, wantData);
+  };
+
+  const createDataHandler = async () => {
+    let haveData;
+    let wantData;
+    if (haveCreateSwap[0] === 'erc20') {
+      haveData = {
+        type: haveCreateSwap[0],
+        address: haveCreateSwap[1],
+        amount: haveCreateSwap[2],
+      };
+    } else if (haveCreateSwap[0] === 'erc721') {
+      haveData = {
+        type: haveCreateSwap[0],
+        address: haveCreateSwap[1],
+        id: haveCreateSwap[2],
+      };
+    }
+
+    if (wantCreateSwap[0] === 'erc20') {
+      wantData = {
+        type: wantCreateSwap[0],
+        address: wantCreateSwap[1],
+        amount: wantCreateSwap[2],
+      };
+    } else if (haveCreateSwap[0] === 'erc721') {
+      wantData = {
+        type: wantCreateSwap[0],
+        address: wantCreateSwap[1],
+        id: wantCreateSwap[2],
+      };
+    }
+
+    return { haveData, wantData };
   };
 
   return (
