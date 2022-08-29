@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import { ethers } from 'ethers';
-import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { isCreateSwapModalState, walletAddressState } from '../../Atoms';
 import { NavbarPropsType } from './Navbar.types';
@@ -20,12 +19,16 @@ const Navbar: React.FC<NavbarPropsType> = () => {
   };
 
   const walletConnectHandler = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-    await provider.send('eth_requestAccounts', []);
-    const signer = provider.getSigner();
-    const account = await signer.getAddress();
-    console.log('Account:');
-    setWalletAddress(account);
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+      await provider.send('eth_requestAccounts', []);
+      const signer = provider.getSigner();
+      const account = await signer.getAddress();
+      console.log('Account:');
+      setWalletAddress(account);
+    } catch (error) {
+      console.log('error', error);
+    }
   };
 
   return (
