@@ -5,10 +5,11 @@ interface AddressesTypes {
   from: string;
   privateKey: string;
 }
+const RPC_URL_KEY = process.env.RPC_URL_KEY;
 
-const Addresses: AddressesTypes = {
+https: const Addresses: AddressesTypes = {
   ContractAddress: process.env.CONTACT_ADDRESS || '',
-  RPC_URL: process.env.RPC_URL || '',
+  RPC_URL: `https://polygon-mumbai.g.alchemy.com/v2/${RPC_URL_KEY}`,
   ABI: require(`../../ABI/abi.json`),
   from: process.env.FROM_ADDRESS || '',
   privateKey: process.env.PRIVATE_KEY || '',
