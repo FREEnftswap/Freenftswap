@@ -2,7 +2,7 @@ import { BigNumber, ethers } from 'ethers';
 import getProvider from './getProvider';
 import Addresses from './Addresses';
 
-async function sendContract(param: any, method: string) {
+async function sendContract(method: string, param: any) {
   const provider = await getProvider();
   const wallet = new ethers.Wallet(Addresses.privateKey);
   const walletSigner = wallet.connect(provider);

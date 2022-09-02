@@ -27,6 +27,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
+    "@opensea/seaport-js": "^1.0.5",
     "alchemy-sdk": "^2.0.3",
     "axios": "^0.27.2",
     "ethers": "^5.7.0",

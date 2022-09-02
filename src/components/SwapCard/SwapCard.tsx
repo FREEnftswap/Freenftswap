@@ -1,8 +1,28 @@
 import styled from '@emotion/styled';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import getNftMetadata from '../../utils/web3/getNFTmetadata';
 import { SwapCardPropsType } from './SwapCard.types';
 
-const SwapCard: React.FC<SwapCardPropsType> = () => {
+const SwapCard: React.FC<SwapCardPropsType> = ({ data }) => {
+  const [have, setHave] = useState<any>({});
+  const [want, setWant] = useState<any>({});
+
+  useEffect(() => {
+    (async () => {
+      if (data.have.type === 'erc721') {
+        setHave(await getNftMetadata(data.have.address, data.have.id));
+      }
+      if (data.want.type === 'erc721') {
+        setWant(await getNftMetadata(data.want.address, data.want.id));
+      }
+    })();
+    if (have.rawMetadata) {
+      // console.log('\n\n !!!');
+      // console.log(have.rawMetadata.image);
+    }
+  }, [data]);
+
   const tokenName = 'BOKI';
   const tokenAddress = '0x123123123123123123213';
   return (
@@ -15,12 +35,25 @@ const SwapCard: React.FC<SwapCardPropsType> = () => {
               <AddressBox>{tokenAddress}</AddressBox>
             </TokenTextContainer>
             <TokenImageBox>
-              <Image
-                src="/dummy/dummy1.png"
-                alt="swap icon"
-                width="200px"
-                height="200px"
-              />
+              {have.rawMetadata ? (
+                <>
+                  <img
+                    src={have.rawMetadata.image}
+                    alt="swap icon"
+                    width="200px"
+                    height="200px"
+                  />
+                </>
+              ) : (
+                <>
+                  <Image
+                    src="/dummy/dummy1.png"
+                    alt="swap icon"
+                    width="200px"
+                    height="200px"
+                  />
+                </>
+              )}
             </TokenImageBox>
           </SwapItem>
         </Wrapper>

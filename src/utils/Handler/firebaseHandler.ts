@@ -13,7 +13,7 @@ export async function firebaseCreator(
     createAt: Date.now(),
   });
 
-  console.log('Document written with ID: ', docRef.id);
+  // console.log('Document written with ID: ', docRef.id);
 }
 
 export async function firebaseReader() {

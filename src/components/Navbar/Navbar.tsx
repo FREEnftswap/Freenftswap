@@ -24,7 +24,7 @@ const Navbar: React.FC<NavbarPropsType> = () => {
       await provider.send('eth_requestAccounts', []);
       const signer = provider.getSigner();
       const account = await signer.getAddress();
-      console.log('Account:');
+      // console.log('Account:');
       setWalletAddress(account);
     } catch (error) {
       console.log('error', error);
