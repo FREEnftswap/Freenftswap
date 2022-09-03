@@ -1,18 +1,13 @@
 import SwapCard from '../SwapCard';
 import { SwapListPropsType } from './SwapList.types';
 
-const SwapList: React.FC<SwapListPropsType> = () => {
+const SwapList: React.FC<SwapListPropsType> = ({ dataList }) => {
   return (
-    <div>
-      <SwapCard />
-      <SwapCard />
-      <SwapCard />
-      <SwapCard />
-      <SwapCard />
-      <SwapCard />
-      <SwapCard />
-      <SwapCard />
-    </div>
+    <>
+      {dataList.map((data: any, i: number) => (
+        <SwapCard key={i} data={data} />
+      ))}
+    </>
   );
 };
 
