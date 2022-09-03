@@ -1,12 +1,16 @@
 import styled from '@emotion/styled';
+import { Seaport } from '@opensea/seaport-js';
+import { ethers } from 'ethers';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import getNftMetadata from '../../utils/web3/getNFTmetadata';
 import { SwapCardPropsType } from './SwapCard.types';
+import { toast, ToastContainer } from 'react-toastify';
 
 const SwapCard: React.FC<SwapCardPropsType> = ({ data }) => {
   const [have, setHave] = useState<any>({});
   const [want, setWant] = useState<any>({});
+  const [order, setOrder] = useState<any>({});
 
   useEffect(() => {
     (async () => {
@@ -19,40 +23,82 @@ const SwapCard: React.FC<SwapCardPropsType> = ({ data }) => {
     })();
     if (have.rawMetadata) {
       // console.log('\n\n !!!');
-      // console.log(have.rawMetadata.image);
+      console.log(have);
     }
+
+    setOrder(data.order);
   }, [data]);
 
-  const tokenName = 'BOKI';
-  const tokenAddress = '0x123123123123123123213';
+  useEffect(() => {
+    console.log(data);
+  }, [have, want]);
+
+  const seaportOrderSwap = async (_data: any) => {
+    console.log('_data : ', _data);
+    const fulfiller = _data.walletAddress;
+
+    const accounts = await window.ethereum.request({
+      method: 'eth_requestAccounts',
+    });
+
+    const address = accounts[0];
+    const offerer = address;
+    console.log(fulfiller, offerer);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const signature = await signer.signMessage(address);
+
+    const seaport = new Seaport(signer, {
+      overrides: { contractAddress: '0x5C829805796843A285C0cb875E34BB67Abb99B22' },
+    });
+    const { executeAllActions: executeAllFulfillActions } = await seaport.fulfillOrder({
+      order,
+      accountAddress: fulfiller,
+      recipientAddress: offerer,
+    });
+    const transaction = await executeAllFulfillActions();
+    console.log('transaction result : ', transaction);
+    if (transaction) {
+      notify();
+    }
+  };
+  const notify = () =>
+    toast('🦄 swap success', {
+      position: 'top-center',
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'dark',
+    });
   return (
     <Container>
       <ItemContainer>
         <Wrapper>
           <SwapItem>
             <TokenTextContainer>
-              <TokenNameBox>{tokenName}</TokenNameBox>
-              <AddressBox>{tokenAddress}</AddressBox>
+              <TokenNameBox>
+                {have.title} #{have.tokenId}
+              </TokenNameBox>
+              <AddressBox>{have.contract?.address}</AddressBox>
             </TokenTextContainer>
             <TokenImageBox>
-              {have.rawMetadata ? (
-                <>
-                  <img
-                    src={have.rawMetadata.image}
-                    alt="swap icon"
-                    width="200px"
-                    height="200px"
-                  />
-                </>
+              {have.rawMetadata?.image ? (
+                <img
+                  src={`https://ipfs.io/ipfs/${have.rawMetadata?.image.replace(
+                    'ipfs:/',
+                    '',
+                  )}`}
+                  alt="swap icon"
+                  width="200px"
+                  height="200px"
+                />
               ) : (
-                <>
-                  <Image
-                    src="/dummy/dummy1.png"
-                    alt="swap icon"
-                    width="200px"
-                    height="200px"
-                  />
-                </>
+                <div
+                  style={{ width: '200px', height: '200px', backgroundColor: 'grey' }}
+                />
               )}
             </TokenImageBox>
           </SwapItem>
@@ -69,22 +115,58 @@ const SwapCard: React.FC<SwapCardPropsType> = ({ data }) => {
             }}
           />
         </WrapperCenter>
-        <Wrapper>
-          <SwapItem>
-            <TokenNameBox>{tokenName}</TokenNameBox>
-            <AddressBox>{tokenAddress}</AddressBox>
-            <TokenImageBox>
-              <Image
-                src="/dummy/dummy2.png"
-                alt="swap icon"
-                width="200px"
-                height="200px"
-              />
-            </TokenImageBox>
-          </SwapItem>
-        </Wrapper>
+        {data.want.type ? (
+          <Wrapper>
+            <SwapItem>
+              <TokenTextContainer>
+                <TokenNameBox>matic</TokenNameBox>
+                <AddressBox>{data.want.amount} matic</AddressBox>
+              </TokenTextContainer>
+              <TokenImageBox>
+                <Image
+                  src="/imgs/matic.png"
+                  alt="swap icon"
+                  width="200px"
+                  height="200px"
+                />
+              </TokenImageBox>
+            </SwapItem>
+          </Wrapper>
+        ) : (
+          <Wrapper>
+            <SwapItem>
+              <TokenTextContainer>
+                <TokenNameBox>
+                  {data.want.title} #{data.want.tokenId}
+                </TokenNameBox>
+                <AddressBox>{want.contract?.address}</AddressBox>
+              </TokenTextContainer>
+              <TokenImageBox>
+                {want.rawMetadata?.image ? (
+                  <>
+                    <img
+                      src={`https://ipfs.io/ipfs/${want.rawMetadata?.image.replace(
+                        'ipfs:/',
+                        '',
+                      )}`}
+                      alt="swap icon"
+                      width="200px"
+                      height="200px"
+                    />
+                  </>
+                ) : null}
+              </TokenImageBox>
+            </SwapItem>
+          </Wrapper>
+        )}
       </ItemContainer>
-      <SwapButton>SWAP</SwapButton>
+      <SwapButton
+        onClick={() => {
+          seaportOrderSwap(data);
+        }}
+      >
+        SWAP
+      </SwapButton>
     </Container>
   );
 };
